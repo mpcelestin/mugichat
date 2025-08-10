@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Report User: {{ reported_user.username }}</h4>
+                </div>
+                <div class="card-body">
+                    <form id="reportForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason</label>
+                            <select class="form-select" id="reason" name="reason" required>
+                                <option value="">Select a reason</option>
+                                <option value="scam">Scam/Fraud</option>
+                                <option value="spam">Spam</option>
+                                <option value="harassment">Harassment</option>
+                                <option value="inappropriate">Inappropriate Content</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="details" class="form-label">Details</label>
+                            <textarea class="form-control" id="details" name="details" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Submit Report</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reportForm');
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            // Get current CSRF token
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            
+            // Prepare form data
+            const formData = {
+                reason: document.getElementById('reason').value,
+                details: document.getElementById('details').value
+            };
+            
+            // Submit report
+            const response = await fetch("{{ url_for('report_user', user_id=reported_user.id) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                // Update CSRF token from response if available
+                if (data.csrf_token) {
+                    document.querySelector('input[name="csrf_token"]').value = data.csrf_token;
+                }
+                throw new Error(data.error || 'Failed to submit report');
+            }
+            
+            if (data.success) {
+                alert('Report submitted successfully!');
+                window.location.href = "{{ url_for('user_posts', username=reported_user.username) }}";
+            } else {
+                throw new Error(data.error || 'Failed to submit report');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error: ' + error.message);
+            
+            // Refresh CSRF token on error
+            const csrfResponse = await fetch('/refresh_csrf');
+            const csrfData = await csrfResponse.json();
+            document.querySelector('input[name="csrf_token"]').value = csrfData.token;
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

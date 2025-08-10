@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Results for "{{ query }}"</h3>
+    
+    <!-- USERS -->
+    <h4 class="mt-4">Users</h4>
+    {% if users %}
+        <ul class="list-group">
+        {% for user in users %}
+            <li class="list-group-item d-flex align-items-center">
+                <img src="{{ url_for('static', filename='profile_pics/' + user.profile_pic) }}" 
+                     class="rounded-circle mr-3" width="40" height="40">
+                <strong class="ml-3">{{ user.username }}</strong>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+
+    <!-- POSTS -->
+    <h4 class="mt-4">Posts</h4>
+    {% if posts %}
+        {% for post in posts %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6>{{ post.author.username }} <small class="text-muted">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small></h6>
+                <p>{{ post.content }}</p>
+                {% if post.image %}
+                    <img src="{{ url_for('static', filename='post_pics/' + post.image) }}" class="img-fluid">
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No posts found.</p>
+    {% endif %}
+
+    <!-- GROUPS -->
+    <h4 class="mt-4">Groups</h4>
+    {% if groups %}
+        <ul class="list-group">
+        {% for group in groups %}
+            <li class="list-group-item">
+                <strong>{{ group.name }}</strong>
+                <p>{{ group.description }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No groups found.</p>
+    {% endif %}
+</div>
+{% endblock %}

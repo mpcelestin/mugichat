@@ -1,0 +1,16 @@
+<div class="reactions-container">
+    <div class="reaction-options">
+        <button class="reaction-btn" data-reaction="like">👍</button>
+        <button class="reaction-btn" data-reaction="love">❤️</button>
+        <button class="reaction-btn" data-reaction="haha">😆</button>
+        <button class="reaction-btn" data-reaction="wow">😲</button>
+        <button class="reaction-btn" data-reaction="sad">😢</button>
+        <button class="reaction-btn" data-reaction="angry">😡</button>
+    </div>
+    <div class="like-btn">
+        {% if post.current_user_like() %}
+            <span class="current-reaction">{{ post.current_user_like().reaction }}</span>
+        {% endif %}
+        <span class="likes-count">{{ post.likes_count }}</span>
+    </div>
+</div>

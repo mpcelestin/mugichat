@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('home') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.content(class="form-control", placeholder="What's on your mind?", rows=3) }}
+                        {% if form.content.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.content.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-group">
+                            {{ form.image(class="form-control-file") }}
+                            {% if form.image.errors %}
+                                {% for error in form.image.errors %}
+                                    <small class="text-danger d-block">{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% for post in posts %}
+            <div class="card mb-4 post-card" id="post-{{ post.id }}">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ url_for('static', filename='profile_pics/' + post.author.profile_pic) }}" 
+                             class="rounded-circle me-2" width="40" height="40" alt="{{ post.author.username }}">
+                        <div>
+                            <h6 class="mb-0">
+                                <a href="{{ url_for('user_posts', username=post.author.username) }}" class="text-decoration-none">
+                                    {{ post.author.username }}
+                                </a>
+                            </h6>
+                            <small class="text-muted">{{ post.timestamp|datetimeformat }}</small>
+                        </div>
+                    </div>
+                    
+                    <p class="mb-3">{{ post.content }}</p>
+                    
+                    {% if post.image %}
+                        <img src="{{ url_for('static', filename='post_pics/' + post.image) }}" 
+                             class="img-fluid rounded mb-3" alt="Post image">
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex">
+                            <!-- Like Button with Reactions -->
+                            <div class="reactions-container me-2">
+                                <button class="btn btn-sm btn-outline-secondary like-btn" 
+                                        data-post-id="{{ post.id }}">
+                                    {% if post.current_user_like() %}
+                                        <span class="current-reaction">{{ post.current_user_like().reaction }}</span>
+                                    {% endif %}
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                    <span class="likes-count">{{ post.likes_count }}</span>
+                                </button>
+                                <div class="reaction-options">
+                                    <span class="reaction-option" data-reaction="👍">👍</span>
+                                    <span class="reaction-option" data-reaction="❤️">❤️</span>
+                                    <span class="reaction-option" data-reaction="😂">😂</span>
+                                    <span class="reaction-option" data-reaction="😲">😲</span>
+                                    <span class="reaction-option" data-reaction="😢">😢</span>
+                                    <span class="reaction-option" data-reaction="😡">😡</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Comment Button -->
+                            <a href="{{ url_for('post', post_id=post.id) }}" class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="bi bi-chat"></i> <span class="comment-count">{{ post.comments|length }}</span>
+                            </a>
+                            
+                            <!-- Share Button -->
+                            <button class="btn btn-sm btn-outline-secondary share-btn" data-post-id="{{ post.id }}">
+                                <i class="bi bi-share"></i> Share
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comment preview section -->
+                    {% if post.comments %}
+                        <div class="mt-3">
+                            {% for comment in post.comments[:2] %}
+                                <div class="d-flex mb-2">
+                                    <img src="{{ url_for('static', filename='profile_pics/' + comment.author.profile_pic) }}" 
+                                         class="rounded-circle me-2" width="30" height="30" alt="{{ comment.author.username }}">
+                                    <div class="bg-light p-2 rounded">
+                                        <strong>{{ comment.author.username }}</strong>
+                                        <p class="mb-0">{{ comment.content }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {% if post.comments|length > 2 %}
+                                <a href="{{ url_for('post', post_id=post.id) }}" class="text-decoration-none">
+                                    View all {{ post.comments|length }} comments
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">Share Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="shareUrl" class="form-label">Post URL</label>
+                    <input type="text" class="form-control" id="shareUrl" readonly>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-outline-primary" id="copyLinkBtn">
+                        <i class="bi bi-clipboard"></i> Copy Link
+                    </button>
+                    <a href="#" class="btn btn-outline-primary" id="shareFacebook">
+                        <i class="bi bi-facebook"></i> Facebook
+                    </a>
+                    <a href="#" class="btn btn-outline-primary" id="shareTwitter">
+                        <i class="bi bi-twitter"></i> Twitter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle like button clicks
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const postId = this.dataset.postId;
+            likePost(postId);
+        });
+    });
+
+    // Handle reaction selection
+    document.querySelectorAll('.reaction-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const postId = this.closest('.reactions-container').querySelector('.like-btn').dataset.postId;
+            const reaction = this.dataset.reaction;
+            likePost(postId, reaction);
+        });
+    });
+
+    // Handle share button clicks
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const postUrl = `${window.location.origin}/post/${postId}`;
+            
+            // Set the URL in the modal
+            document.getElementById('shareUrl').value = postUrl;
+            
+            // Set up social sharing links
+            document.getElementById('shareFacebook').href = 
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+            document.getElementById('shareTwitter').href = 
+                `https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}`;
+            
+            // Show the modal
+            const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+            shareModal.show();
+        });
+    });
+
+    // Handle copy link button
+    document.getElementById('copyLinkBtn')?.addEventListener('click', function() {
+        const shareUrl = document.getElementById('shareUrl');
+        shareUrl.select();
+        document.execCommand('copy');
+        
+        // Show feedback
+        const originalText = this.innerHTML;
+        this.innerHTML = '<i class="bi bi-check"></i> Copied!';
+        setTimeout(() => {
+            this.innerHTML = originalText;
+        }, 2000);
+    });
+});
+
+function likePost(postId, reaction = 'like') {
+    fetch(`/post/${postId}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ reaction: reaction })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update like button
+            const likeBtn = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+            const countSpan = likeBtn.querySelector('.likes-count');
+            
+            countSpan.textContent = data.likes_count;
+            
+            // Update reaction display
+            let reactionSpan = likeBtn.querySelector('.current-reaction');
+            if (data.action === 'unliked') {
+                if (reactionSpan) reactionSpan.remove();
+            } else {
+                if (!reactionSpan) {
+                    reactionSpan = document.createElement('span');
+                    reactionSpan.className = 'current-reaction';
+                    likeBtn.prepend(reactionSpan);
+                }
+                reactionSpan.textContent = data.current_reaction;
+            }
+        }
+    });
+}
+
+// Socket.IO for real-time updates
+socket.on('update_likes', function(data) {
+    const likeBtns = document.querySelectorAll(`.like-btn[data-post-id="${data.post_id}"]`);
+    likeBtns.forEach(btn => {
+        const countSpan = btn.querySelector('.likes-count');
+        if (countSpan) {
+           countSpan.textContent = data.likes_count;
+        }
+    });
+});
+</script>
+{% endblock %}

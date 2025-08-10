@@ -1,0 +1,215 @@
+:root {
+    --primary-color: #3b5998;
+    --secondary-color: #8b9dc3;
+    --light-color: #dfe3ee;
+    --lighter-color: #f7f7f7;
+    --dark-color: #1d2129;
+}
+
+body {
+    background-color: var(--lighter-color);
+    color: var(--dark-color);
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--primary-color) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Cards */
+.card {
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+}
+
+/* Forms */
+.form-control:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.25rem rgba(59, 89, 152, 0.25);
+}
+
+/* Images */
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Comments */
+.comment-box {
+    background-color: var(--light-color);
+    border-radius: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+}
+
+/* Dark mode toggle */
+.dark-mode {
+    background-color: #1a1a1a;
+    color: #f1f1f1;
+}
+
+.dark-mode .card {
+    background-color: #2d2d2d;
+    color: #f1f1f1;
+}
+
+.dark-mode .card-header {
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #444;
+}
+
+.dark-mode .form-control {
+    background-color: #333;
+    color: #f1f1f1;
+    border-color: #444;
+}
+
+.dark-mode .comment-box {
+    background-color: #333;
+}
+
+.reactions-container {
+    position: relative;
+    display: inline-block;
+}
+
+.reaction-options {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    padding: 5px;
+    display: none;
+    z-index: 100;
+}
+
+.reactions-container.show-options .reaction-options {
+    display: block;
+}
+
+.reaction-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.reaction-btn:hover {
+    transform: scale(1.3);
+}
+
+.like-btn {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: #f0f2f5;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.current-reaction {
+    font-size: 1.2em;
+}
+
+/* Add this to your CSS file */
+.reactions-container {
+    position: relative;
+    display: inline-block;
+}
+
+.reaction-options {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 5px;
+    display: none;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.reactions-container:hover .reaction-options {
+    display: block;
+}
+
+.reaction-option {
+    display: inline-block;
+    margin: 0 3px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: transform 0.2s;
+}
+
+.reaction-option:hover {
+    transform: scale(1.3);
+}
+
+.current-reaction {
+    margin-right: 5px;
+}
+
+
+/* Image controls styling */
+.position-relative {
+    position: relative;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
+.bottom-0 {
+    bottom: 0;
+}
+
+.end-0 {
+    right: 0;
+}
+
+.m-2 {
+    margin: 0.5rem;
+}
+
+.btn-group {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.position-relative:hover .btn-group {
+    opacity: 1;
+}

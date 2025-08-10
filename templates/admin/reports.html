@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h2>User Reports</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Reporter</th>
+                        <th>Reported User</th>
+                        <th>Reason</th>
+                        <th>Details</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                        <tr>
+                            <td>{{ report.id }}</td>
+                            <td>
+                                <a href="{{ url_for('user_posts', username=report.reporter.username) }}">
+                                    {{ report.reporter.username }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('user_posts', username=report.reported_user.username) }}">
+                                    {{ report.reported_user.username }}
+                                </a>
+                            </td>
+                            <td>{{ report.reason }}</td>
+                            <td>{{ report.details|truncate(50) }}</td>
+                            <td>
+                                <span class="badge {% if report.status == 'pending' %}bg-warning{% else %}bg-success{% endif %}">
+                                    {{ report.status }}
+                                </span>
+                            </td>
+                            <td>{{ report.timestamp|datetimeformat }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('resolve_report', report_id=report.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-success">Mark Resolved</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

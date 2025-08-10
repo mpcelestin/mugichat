@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Create Group{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Create New Group</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form.name.label(class="form-control-label") }}
+                        {% if form.name.errors %}
+                            {{ form.name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.name(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.description.label(class="form-control-label") }}
+                        {{ form.description(class="form-control", rows=3) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.is_public.label(class="form-control-label") }}
+                        {{ form.is_public(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.group_pic.label() }}
+                        {{ form.group_pic(class="form-control-file") }}
+                        {% if form.group_pic.errors %}
+                            {% for error in form.group_pic.errors %}
+                                <span class="text-danger">{{ error }}</span><br>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Live Streams</h2>
+    
+    {% if live_streams %}
+        <div class="row">
+            {% for stream in live_streams %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ stream.title }}</h5>
+                            <p class="card-text">
+                                Streaming by <a href="{{ url_for('user_posts', username=stream.user.username) }}">{{ stream.user.username }}</a>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-people-fill"></i> {{ stream.viewers_count }} viewers
+                                </span>
+                                <a href="{{ url_for('view_stream', stream_id=stream.id) }}" class="btn btn-primary btn-sm">
+                                    Watch Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No live streams at the moment. Be the first to <a href="{{ url_for('live') }}">go live</a>!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ url_for('static', filename='group_pics/' + group.group_pic) }}" 
+                         class="rounded-circle me-3" width="80" height="80">
+                    <div>
+                        <h2>{{ group.name }}</h2>
+                        <p class="text-muted mb-1">{{ group.description }}</p>
+                        <small class="text-muted">
+                            Created by <a href="{{ url_for('user_posts', username=group.creator.username) }}">
+                                {{ group.creator.username }}
+                            </a> • {{ group.members|length }} members
+                        </small>
+                    </div>
+                    
+                    <div class="ms-auto">
+                        {% if not is_member %}
+                            <form method="POST" action="{{ url_for('join_group', group_id=group.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-primary">Join Group</button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('leave_group', group_id=group.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-outline-danger">Leave Group</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if is_member %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.content(class="form-control", placeholder="What's on your mind?") }}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ form.image(class="form-control form-control-sm") }}
+                            </div>
+                            <div>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        {% for post in posts %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ url_for('static', filename='profile_pics/' + post.author.profile_pic) }}" 
+                             class="rounded-circle me-2" width="40" height="40">
+                        <div>
+                            <h6 class="mb-0">
+                                <a href="{{ url_for('user_posts', username=post.author.username) }}">
+                                    {{ post.author.username }}
+                                </a>
+                            </h6>
+                            <small class="text-muted">{{ post.timestamp.strftime('%B %d, %Y at %H:%M') }}</small>
+                        </div>
+                    </div>
+                    
+                    <p>{{ post.content }}</p>
+                    
+                    {% if post.image %}
+                        <img src="{{ url_for('static', filename='post_pics/' + post.image) }}" 
+                             class="img-fluid mb-3 rounded">
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="bi bi-hand-thumbs-up"></i> Like
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-chat"></i> Comment
+                            </button>
+                        </div>
+                        <div>
+                            <small class="text-muted">0 likes • 0 comments</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>About</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ group.description }}</p>
+                <hr>
+                <p class="mb-1"><strong>Created:</strong> {{ group.created_at.strftime('%B %d, %Y') }}</p>
+                <p><strong>Privacy:</strong> {{ 'Public' if group.is_public else 'Private' }}</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Members ({{ group.members|length }})</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for member in members %}
+                        <div class="col-4 mb-3 text-center">
+                            <a href="{{ url_for('user_posts', username=member.member.username) }}">
+                                <img src="{{ url_for('static', filename='profile_pics/' + member.member.profile_pic) }}" 
+                                     class="rounded-circle mb-1" width="50" height="50">
+                                <p class="small mb-0">{{ member.member.username }}</p>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

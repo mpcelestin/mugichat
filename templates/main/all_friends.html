@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>
+                        <a href="{{ url_for('user_posts', username=user.username) }}" class="text-decoration-none">
+                            {{ user.username }}
+                        </a>'s Friends
+                        <small class="text-muted">{{ friends_count }} friends</small>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if mutual_friends %}
+                        <div class="mb-4">
+                            <h5>Mutual Friends</h5>
+                            <div class="row">
+                                {% for mfriend in mutual_friends %}
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <a href="{{ url_for('user_posts', username=mfriend.username) }}" class="text-decoration-none">
+                                                <img src="{{ url_for('static', filename='profile_pics/' + mfriend.profile_pic) }}" 
+                                                     class="card-img-top" 
+                                                     alt="{{ mfriend.username }}">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ mfriend.username }}</h6>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <hr>
+                    {% endif %}
+                    
+                    <div class="row">
+                        {% for friend in friends %}
+                            <div class="col-md-3 mb-3">
+                                <div class="card">
+                                    <a href="{{ url_for('user_posts', username=friend.username) }}" class="text-decoration-none">
+                                        <img src="{{ url_for('static', filename='profile_pics/' + friend.profile_pic) }}" 
+                                             class="card-img-top" 
+                                             alt="{{ friend.username }}">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ friend.username }}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

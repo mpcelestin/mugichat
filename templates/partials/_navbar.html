@@ -1,0 +1,52 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('home') }}">MugiChat</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('friends') }}">Friends</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('messages') }}">Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('groups') }}">Groups</a>
+                </li>
+            </ul>
+            <form class="d-flex me-2" action="{{ url_for('search') }}" method="GET">
+                <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" 
+                             class="rounded-circle" width="30" height="30">
+                        {{ current_user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ url_for('account') }}">Profile</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('notifications') }}">Notifications</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

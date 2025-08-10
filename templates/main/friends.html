@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Friends</h2>
+            <a href="{{ url_for('view_friend_requests') }}" class="btn btn-info position-relative">
+                Friend Requests
+                {% if received_requests|length > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ received_requests|length }}
+                    </span>
+                {% endif %}
+            </a>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Your Friends</h5>
+            </div>
+            <div class="card-body">
+                {% if friends %}
+                    <div class="row">
+                        {% for friend in friends %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ url_for('static', filename='profile_pics/' + friend.profile_pic) }}" 
+                                                 class="rounded-circle me-3" width="50" height="50">
+                                            <div>
+                                                <h6 class="mb-0">
+                                                    <a href="{{ url_for('user_posts', username=friend.username) }}">
+                                                        {{ friend.username }}
+                                                    </a>
+                                                </h6>
+                                                <small class="text-muted">Last seen: {{ friend.last_seen|datetimeformat }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <form method="POST" action="{{ url_for('remove_friend', friend_id=friend.id) }}">
+                                                {{ remove_form.hidden_tag() }}
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Remove Friend</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">You don't have any friends yet.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if sent_requests %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Sent Requests</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for request, recipient in sent_requests %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    To: <a href="{{ url_for('user_posts', username=recipient.username) }}">{{ recipient.username }}</a>
+                                    <small class="text-muted d-block">Sent {{ request.timestamp|datetimeformat }}</small>
+                                </div>
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if suggested %}
+            <div class="card">
+                <div class="card-header">
+                    <h5>Suggested Friends</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for user in suggested %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="{{ url_for('static', filename='profile_pics/' + user.profile_pic) }}" 
+                                                 class="rounded-circle me-3" width="50" height="50">
+                                            <div>
+                                                <h6 class="mb-0">
+                                                    <a href="{{ url_for('user_posts', username=user.username) }}">
+                                                        {{ user.username }}
+                                                    </a>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('send_friend_request', user_id=user.id) }}">
+                                            {{ request_form.hidden_tag() }}
+                                            <button type="submit" class="btn btn-primary btn-sm">Add Friend</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,118 @@
+ {% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Left Column - Profile Info -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img class="rounded-circle account-img mb-3" src="{{ url_for('static', filename='profile_pics/' + user.profile_pic) }}" width="150" height="150">
+                    <h2 class="account-heading">{{ user.username }}</h2>
+                    <p class="text-secondary">{{ user.bio }}</p>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ user.location or 'No location set' }}</p>
+                    
+                    <!-- Message Button -->
+                    {% if is_friend %}
+                        <a href="{{ url_for('chat', user_id=user.id) }}" class="btn btn-primary btn-block mb-2">
+                            <i class="fas fa-envelope"></i> Message
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Friend Status Buttons -->
+                    {% if user.id != current_user.id %}
+                        {% if is_friend %}
+                            <form action="{{ url_for('remove_friend', friend_id=user.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger btn-block">
+                                    <i class="fas fa-user-minus"></i> Remove Friend
+                                </button>
+                            </form>
+                        {% elif friend_request %}
+                            <button class="btn btn-secondary btn-block" disabled>
+                                <i class="fas fa-user-clock"></i> Request Sent
+                            </button>
+                        {% else %}
+                            <form action="{{ url_for('send_friend_request', user_id=user.id) }}" method="POST">
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-user-plus"></i> Add Friend
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Friends Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Friends</h5>
+                    <small class="text-muted">{{ friends_count }} friends</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for friend in friends %}
+                            <div class="col-4 mb-3">
+                                <a href="{{ url_for('user_posts', username=friend.username) }}" class="text-decoration-none">
+                                    <img src="{{ url_for('static', filename='profile_pics/' + friend.profile_pic) }}" 
+                                         class="img-fluid rounded-circle" 
+                                         width="80" height="80"
+                                         title="{{ friend.username }}">
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if friends_count > 9 %}
+                        <a href="{{ url_for('view_all_friends', user_id=user.id) }}" class="btn btn-outline-primary btn-sm btn-block">
+                            See All Friends
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Mutual Friends -->
+                    {% if mutual_friends %}
+                        <hr>
+                        <h6>Mutual Friends</h6>
+                        <div class="row">
+                            {% for mfriend in mutual_friends %}
+                                <div class="col-4 mb-3">
+                                    <a href="{{ url_for('user_posts', username=mfriend.username) }}" class="text-decoration-none">
+                                        <img src="{{ url_for('static', filename='profile_pics/' + mfriend.profile_pic) }}" 
+                                             class="img-fluid rounded-circle" 
+                                             width="80" height="80"
+                                             title="{{ mfriend.username }}">
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column - Posts -->
+<div class="col-md-8">
+    {% if form %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form.content(class="form-control", placeholder="What's on your mind?") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.image(class="form-control-file") }}
+                        <small class="text-muted">Optional: Upload an image</small>
+                    </div>
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+    
+    {% for post in posts %}
+        {% include 'main/post_card.html' %}
+    {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Friends</h5>
+    </div>
+    <div class="card-body">
+        {% if friends %}
+            <div class="row">
+                {% for friend in friends %}
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='profile_pics/' + friend.profile_pic) }}" 
+                                 class="rounded-circle mr-2" width="50" height="50">
+                            <div>
+                                <h6 class="mb-0"><a href="{{ url_for('user_posts', username=friend.username) }}">{{ friend.username }}</a></h6>
+                                <small class="text-muted">Last seen: {{ friend.last_seen.strftime('%Y-%m-%d') if friend.last_seen else 'Never' }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No friends yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if received_requests %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Friend Requests</h5>
+    </div>
+    <div class="card-body">
+        {% for request in received_requests %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center">
+                    <img src="{{ url_for('static', filename='profile_pics/' + request.sender.profile_pic) }}" 
+                         class="rounded-circle mr-2" width="50" height="50">
+                    <div>
+                        <h6 class="mb-0">{{ request.sender.username }}</h6>
+                        <small class="text-muted">{{ request.timestamp.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                </div>
+                <div>
+                    <form action="{{ url_for('accept_friend_request', request_id=request.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                    </form>
+                    <form action="{{ url_for('reject_friend_request', request_id=request.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if suggested %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>People You May Know</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for user in suggested %}
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="{{ url_for('static', filename='profile_pics/' + user.profile_pic) }}" 
+                             class="rounded-circle mr-2" width="50" height="50">
+                        <div>
+                            <h6 class="mb-0"><a href="{{ url_for('user_posts', username=user.username) }}">{{ user.username }}</a></h6>
+                            {% if user.bio %}
+                                <small class="text-muted">{{ user.bio[:30] }}...</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <form action="{{ url_for('send_friend_request', user_id=user.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-primary btn-sm">Add Friend</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
